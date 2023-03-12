@@ -7,7 +7,8 @@ import hotelsRoute from "./routes/hotels.js";
 import roomsRoute from "./routes/rooms.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-
+import path from 'path';
+const __dirname = path.resolve();
 const app = express();
 dotenv.config();
 
@@ -28,11 +29,17 @@ mongoose.connection.on("disconnected", () => {
 app.use(cors())
 app.use(cookieParser())
 app.use(express.json());
-
+// if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+// } 
 app.use("/api/auth", authRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/hotels", hotelsRoute);
 app.use("/api/rooms", roomsRoute);
+
+app.get("/*", (req, res) => {
+  res.sendFile(path.resolve(__dirname,  "client","build", "index.html"));
+});
 
 app.use((err, req, res, next) => {
   const errorStatus = err.status || 500;
